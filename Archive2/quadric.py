@@ -36,8 +36,8 @@ class QUADRIC:
             sys_sol = torch.zeros(len(samples), self.sample_size, dtype=torch.float32, 
                             device = self.device
                             )
-
-        return torch.hstack((sys_sol, torch.full(size = (len(sys_sol), 1), fill_value= -1))).to(device = self.device, dtype=torch.float32)
+# fill_value = -1/1
+        return torch.hstack((sys_sol, torch.full(size = (len(sys_sol), 1), fill_value=1))).to(device = self.device, dtype=torch.float32)
     
     def get_model(self):
         return self.figure.build_model(quadric = self.get_hypothesis())

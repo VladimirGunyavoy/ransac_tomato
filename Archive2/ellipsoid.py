@@ -70,7 +70,8 @@ class ELLIPSOID:
         if samples is None:
             samples = self.points
         x,y,z = torch.tensor_split(torch.from_numpy(samples), self.dimension, dim=-1)
-        return torch.hstack((x**2, y**2, z**2, 2*x*y, 2*x*z, 2*y*z, 2*x, 2*y, 2*z)).to(dtype=torch.float32)
+        # return torch.hstack((x**2, y**2, z**2, 2*x*y, 2*x*z, 2*y*z, 2*x, 2*y, 2*z)).to(dtype=torch.float32)
+        return torch.hstack((x**2, y**2, z**2, 2*x*y, 2*x*z, 2*y*z, x, y, z)).to(dtype=torch.float32)
     
     def build_model(self, quadric):
         """
@@ -121,14 +122,16 @@ class ELLIPSOID:
             if self.debug: print("Warning: Matrix Q is singular or close to singular. Using pseudoinverse.")
             Q_inv = torch.linalg.pinv(Q)
 
-        center = (torch.transpose(-L, 1, 2) @ Q_inv)/2 #-1
+        # center = (torch.transpose(-L, 1, 2) @ Q_inv)/2  #-1
+        center = (torch.transpose(-L, 1, 2) @ Q_inv)/4  #-1
 
         
         if self.debug: print("q_inv", Q_inv.shape)
         if self.debug: print("center", center.shape)
         
 
-        TP = 0.25 * (torch.transpose(L, 1, 2) @ Q_inv @ L ) + 1
+        # TP = 0.25 * (torch.transpose(L, 1, 2) @ Q_inv @ L ) + 1
+        TP =  (torch.transpose(L, 1, 2) @ Q_inv @ L )/16 + 1
         if self.debug: print("TP", TP.shape)
         
         
@@ -158,7 +161,8 @@ class ELLIPSOID:
             raise RuntimeError(f"The Given hypotheis should be of shape {len(hypothesis)} * {self.dimension**2 + 1} * 1")
         
         pt = self.prepare_columns(samples=None).to(device=self.device) # shape: n_iterations x sphere_resolution x 9
-        pt = torch.hstack((pt, torch.full((pt.shape[0], 1), fill_value = 1,  device=self.device)))
+        # fill_value = -1/1
+        pt = torch.hstack((pt, torch.full((pt.shape[0], 1), fill_value =-1,  device=self.device)))
 
         # # ### For the sign change
         # mask = (pt[:, 0] * pt[:, -1]) < 0

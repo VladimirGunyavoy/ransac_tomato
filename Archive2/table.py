@@ -58,8 +58,8 @@ class Table:
         if self.debug: print("distances", distances.shape, distances.dtype)
 
 
-        mm1 = pred_hyp[:, 0] <= 0
-        res_new[mm1.flatten()] *= -1
+        # mm1 = pred_hyp[:, 0] <= 0
+        # res_new[mm1.flatten()] *= -1
 
         if self.debug: print(res_new)
 

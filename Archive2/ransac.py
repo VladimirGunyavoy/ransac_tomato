@@ -21,14 +21,15 @@ class RANSAC:
 
 
     def __pred_file_exists(self):
-        return os.path.isfile(self.pred_file_address)
+        # return os.path.isfile(self.pred_file_address)
+        return False
         
     def fit(self):
         if not self.loaded:
             if not self.__pred_file_exists():
                 self.__proceed_with_predictions()
                 self.__save_preds()
-                self.loaded = True
+                self.loaded = False
             else:
                 self.model = torch.from_numpy(np.load(self.pred_file_address)['data']).to(device=self.device)
                 self.loaded = True
@@ -40,17 +41,24 @@ class RANSAC:
         
         
     def __save_preds(self):
-        pred_dir = os.path.join(*self.pred_file_address.split('/')[:-1])
+        pred_dir = r'predictions/synthetic/normal_noise/'
+        fine_name = self.pred_file_address.split('\\')[-1]
+        # pred_dir = os.path.join(*(self.pred_file_address.split('\\')[:-1]))
+        # pred_dir = r'/'.join(pred_dir)
+
         if not os.path.exists(pred_dir):
             os.makedirs(pred_dir)
-        np.savez_compressed(self.pred_file_address, data = self.model.detach().cpu())
+
+        # pred_dir += self.pred_file_address.split('\\')[-2:]
+        # pred_dir += r'/'.join(self.pred_file_address.split('\\')[-2:])
+        np.savez_compressed(pred_dir+fine_name, data=self.model.detach().cpu())
         
 
     def get_model(self):
-        if self.loaded:
+        # if self.loaded:
             return self.model
-        else:
-            raise RuntimeError("The model is not loaded!")
+        # else:
+        #     raise RuntimeError("The model is not loaded!")
     
     def validate(self, params: list = []):
         if len(params) == 0:
