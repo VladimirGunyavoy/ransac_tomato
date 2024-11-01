@@ -95,7 +95,7 @@ class Plotter():
                                 line=dict(color='grey', 
                                           width=4, 
                                           dash='longdash'),
-                                name=f'{name} T'))
+                                showlegend=False))
 
         
         self.plot_points(points=T, name=f'{name} center')
